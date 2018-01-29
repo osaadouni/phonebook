@@ -17,13 +17,19 @@
     </p>
   </div>
   <a class="panel-block">
-    <span class="panel-icon">
-      <i class="fas fa-book"></i>
-    </span>
+    
+    <span class="column is-9">
     marksheet
+    </span>
 
-    <span class="panel-icon">
-        <i class="fa fa-trash-o" aria-hidden="true"></i>
+    <span class="panel-icon column is-1">
+        <i class="has-text-danger fa fa-trash-o" aria-hidden="true"></i>
+    </span>
+    <span class="panel-icon column is-1">
+        <i class="has-text-info fa fa-edit" aria-hidden="true"></i>
+    </span>
+    <span class="panel-icon column is-1">
+        <i class="has-text-primary fa fa-eye" aria-hidden="true"></i>
     </span>
     
   </a>
