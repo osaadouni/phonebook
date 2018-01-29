@@ -15,6 +15,9 @@
                     @endif
 
                     You are logged in!
+
+		    @include('phonebook')
+	 
                 </div>
             </div>
         </div>
