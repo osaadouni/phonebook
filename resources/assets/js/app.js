@@ -18,8 +18,8 @@ Vue.use(VueRouter)
 // Create your components 
 let Myheader = require('./components/Myheader.vue');
 let Myfooter = require('./components/Myfooter.vue');
-let Home = require('./components/Home.vue');
-let About = require('./components/About.vue');
+let Home     = require('./components/Home.vue');
+let About    = require('./components/About.vue');
 
 // Create some routes 
 const routes = [
@@ -50,7 +50,7 @@ const app = new Vue({
 
     router, 
     
-    components: { Myheader, Myfooter }, 
+    components: { 'my-header': Myheader, 'my-footer': Myfooter }, 
     
     created() {  
 	    console.log('vm instance created!');

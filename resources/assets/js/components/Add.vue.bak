@@ -20,7 +20,7 @@
                 <div class="field">
                      <label class="label">Name</label>
                      <div class="control">
-                         <input class="input" :class="{'is-danger': errors.name}" type="text" placeholder="Name" v-model="user.name" @click="errors.name=''" >
+                         <input class="input" :class="{'is-danger': errors.name}" type="text" placeholder="Name" v-model="user.name">
                     </div>
                     <small v-if="errors.name" class="has-text-danger">{{ errors.name[0] }}</small>
                 </div>
@@ -78,13 +78,13 @@ export default {
 
             console.log('save()...');
             console.log(this.user);
-            //var $vm = this;
+            var $vm = this;
 
 
             axios.post('/phonebook', this.user).then((response) => {
                 this.close();
             })
-            .catch((error) => this.errors = error.response.data.errors)
+            .catch((error) => this.errors =  error.response.data.errors)
 
             /** 
             axios.post('/phonebook', this.user).then(function(response) {

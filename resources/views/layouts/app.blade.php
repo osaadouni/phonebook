@@ -17,7 +17,7 @@
 
     <div id="app">
 
-    <Myheader></Myheader>
+    <my-header></my-header>
 
     <nav class="navbar is-transparent">
 
@@ -128,9 +128,7 @@
 
     @yield('content')
 
-
-
-    <Myfooter></Myfooter>
+    <my-footer></my-footer>
 
 
     </div>
