@@ -27,10 +27,7 @@ class PhonebookController extends Controller
     public function index()
     {
         // get all the phonebooks 
-        $phonebooks = Phonebook::all()->toArray();
-        return $phonebooks;
-        //return view('phonebook.index', compact('phonebooks'));
-
+        return  Phonebook::orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -52,7 +49,6 @@ class PhonebookController extends Controller
     public function store(PhonebookRequest $request)
     {
         Log::info('store()...');
-
         //return $request->all();
         
         // Method 1.
@@ -122,9 +118,24 @@ class PhonebookController extends Controller
      * @param  \App\Phonebook  $phonebook
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Phonebook $phonebook)
+    public function update(PhonebookRequest $request) //, Phonebook $phonebook)
     {
         //
+        Log::info('update()...');
+        Log::info($request);
+        //  
+        //
+        //return $request->all();
+        // Method 1.
+        $pb = Phonebook::find($request->id);
+        $pb->name = $request->input('name');
+        $pb->phone = $request->input('phone');
+        $pb->email = $request->input('email');
+        $pb->save();
+
+        //Phonebook::create($request->all());
+        return response()->json(['message'=> 'Phonebook record updated successfully!']);
+
     }
 
     /**
@@ -136,5 +147,10 @@ class PhonebookController extends Controller
     public function destroy(Phonebook $phonebook)
     {
         //
+        Log::info('destroy()...');
+        Log::info($phonebook);
+
+        $phonebook::where('id', $phonebook->id)->delete();
+        return response()->json(['message'=> 'Phonebook record deleted successfully!']);
     }
 }

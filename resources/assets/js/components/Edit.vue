@@ -8,7 +8,7 @@
 
             <header class="modal-card-head">
 
-              <p class="modal-card-title">Add New Entry </p>
+                <p class="modal-card-title">Edit Entry #{{ user.id }} </p>
 
               <button class="delete" aria-label="close" @click="close"></button>
 
@@ -43,7 +43,7 @@
 
             <footer class="modal-card-foot">
 
-              <button class="button is-success" @click="save">Save changes</button>
+              <button class="button is-success" @click="update">Update changes</button>
 
               <button class="button" @click="close">Cancel</button>
 
@@ -58,14 +58,12 @@
 
 export default {
     
-    props: ['openModal'], 
+    props: ['openModal', 'user'], 
 
     data() {
             
         return {
         
-            user: { name: '', phone: '', email: '' },
-            
             errMsg: '',
             errors: {}
         }
@@ -74,15 +72,13 @@ export default {
 
     methods: {
     
-        save() {
+        update() {
 
-            console.log('save()...');
+            console.log('update()...');
             console.log(this.user);
-            //var $vm = this;
 
-
-            axios.post('/phonebook', this.user).then((response) => {
-                this.user = { name:'', phone:'', email:''};
+            axios.patch(`/phonebook/${this.user.id}`, this.user).then((response) => {
+                //this.user = { name:'', phone:'', email:''};
                 this.$emit('refresh');
                 this.close();
             })

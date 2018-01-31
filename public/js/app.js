@@ -43607,47 +43607,94 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 
 
 var Add = __webpack_require__(45);
+var Show = __webpack_require__(62);
+var Edit = __webpack_require__(65);
+var Remove = __webpack_require__(68);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
 
         return {
             addActive: '',
-            items: []
+            showActive: '',
+            editActive: '',
+            removeActive: '',
+            items: [],
+            user: {},
+            loading: false,
+            searchQuery: ''
         };
     },
 
 
-    components: { Add: Add },
+    components: { Add: Add, Show: Show, Edit: Edit, Remove: Remove },
 
     methods: {
         openAdd: function openAdd() {
             this.addActive = 'is-active';
         },
+        openShow: function openShow(user) {
+            console.log('openShow()...');
+            console.log(user);
+            this.showActive = 'is-active';
+            this.user = user;
+        },
+        openEdit: function openEdit(user) {
+            console.log('openEdit()...');
+            console.log(user);
+            this.editActive = 'is-active';
+            this.user = user;
+        },
+        openRemove: function openRemove(user) {
+            console.log('openRemove()...');
+            console.log(user);
+            this.removeActive = 'is-active';
+            this.user = user;
+        },
         close: function close() {
             this.addActive = '';
+            this.showActive = '';
+            this.editActive = '';
+            this.removeActive = '';
         },
         fetchAll: function fetchAll() {
-
-            var $component = this;
+            var _this = this;
 
             // Optionally the request above could also be done as
-            axios.get('/phonebook', { params: { ID: 12345 } }).then(function (response) {
-                console.log(response.data);
-                $component.items = response.data;
+            axios.get('/phonebook').then(function (response) {
+                return _this.items = response.data;
             }).catch(function (error) {
-                console.log(error);
+                return _this.errors = error.response.data.errors;
+            });
+        }
+    },
+
+    computed: {
+        filteredList: function filteredList() {
+            var _this2 = this;
+
+            return this.items.filter(function (item) {
+                return item.name.toLowerCase().includes(_this2.searchQuery.toLowerCase()) || item.phone.toLowerCase().includes(_this2.searchQuery.toLowerCase()) || item.email.toLowerCase().includes(_this2.searchQuery.toLowerCase());
             });
         }
     },
 
     created: function created() {
-
         console.log('Home created()...');
         this.fetchAll();
+    },
+    mounted: function mounted() {
+        console.log('Home mounted()...');
     }
 });
 
@@ -43788,47 +43835,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
             axios.post('/phonebook', this.user).then(function (response) {
+                _this.user = { name: '', phone: '', email: '' };
+                _this.$emit('refresh');
                 _this.close();
             }).catch(function (error) {
                 return _this.errors = error.response.data.errors;
             });
-
-            /** 
-            axios.post('/phonebook', this.user).then(function(response) {
-                    console.log('cool huh!');
-                    console.log(response.data);
-                    if (typeof response.data.errors !== typeof undefined ) { 
-                            
-                        console.log(response.data.errors);
-                        var errors = response.data.errors;
-                        for ( var prop in errors ) { 
-                            if ( errors.hasOwnProperty(prop)) { 
-                                console.log('err: ' + errors[prop]);
-                            }  
-                        }
-                         // Object.keys(obj).forEach(function(key,index) {
-                                // key: the name of the object key
-                                    // index: the ordinal position of the key within the object 
-                                });
-                       // 
-                        
-                        return false;
-                    } 
-                     console.log('Success... close me!');
-                    $vm.user = {};
-                    $vm.close();
-                })
-                .catch(function(error) { 
-                    console.log('error!!');
-                    console.log(error);
-                    console.log(error.response.data);   
-                    $vm.errMsg = error.response.data.message; 
-                    $vm.errors = error.response.data.errors; 
-                    console.log('errMsg: ' + $vm.errMsg);
-                    console.log('errors:');
-                    console.log($vm.errors);
-                });
-            **/
         },
         close: function close() {
 
@@ -43852,7 +43864,7 @@ var render = function() {
     _c("div", { staticClass: "modal-card" }, [
       _c("header", { staticClass: "modal-card-head" }, [
         _c("p", { staticClass: "modal-card-title" }, [
-          _vm._v("Add Phonebook ")
+          _vm._v("Add New Entry ")
         ]),
         _vm._v(" "),
         _c("button", {
@@ -43919,6 +43931,9 @@ var render = function() {
               attrs: { type: "text", placeholder: "Phone" },
               domProps: { value: _vm.user.phone },
               on: {
+                click: function($event) {
+                  _vm.errors.phone = ""
+                },
                 input: function($event) {
                   if ($event.target.composing) {
                     return
@@ -43954,6 +43969,9 @@ var render = function() {
               attrs: { type: "email", placeholder: "E-mail" },
               domProps: { value: _vm.user.email },
               on: {
+                click: function($event) {
+                  _vm.errors.email = ""
+                },
                 input: function($event) {
                   if ($event.target.composing) {
                     return
@@ -44016,46 +44034,126 @@ var render = function() {
             _c(
               "button",
               {
-                staticClass: "button is-primary is-outlined is-pulled-right",
+                staticClass:
+                  "button is-primary is-small is-outlined is-pulled-right",
                 on: { click: _vm.openAdd }
               },
               [_vm._v("\n          Add New\n        ")]
-            )
+            ),
+            _vm._v(" "),
+            _vm.loading
+              ? _c("span", { staticClass: "is-pulled-right" }, [
+                  _c("i", { staticClass: "fa fa-refresh fa-spin fa-1x fa-fw" }),
+                  _vm._v(" "),
+                  _c("span", { staticClass: "sr-only" }, [_vm._v("Loading...")])
+                ])
+              : _vm._e()
           ]),
           _c("div", { staticClass: "is-clearfix" }),
           _vm._v(" "),
           _c("p"),
           _vm._v(" "),
-          _vm._m(0),
+          _c("div", { staticClass: "panel-block" }, [
+            _c("p", { staticClass: "control has-icons-left" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.searchQuery,
+                    expression: "searchQuery"
+                  }
+                ],
+                staticClass: "input ",
+                attrs: { type: "text", placeholder: "search" },
+                domProps: { value: _vm.searchQuery },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.searchQuery = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _vm._m(0)
+            ])
+          ]),
           _vm._v(" "),
-          _vm._l(_vm.items, function(item) {
+          _vm._l(_vm.filteredList, function(item, key) {
             return _c("a", { staticClass: "panel-block" }, [
               _c("span", { staticClass: "column is-9" }, [
                 _vm._v(
                   "\n            " +
-                    _vm._s(item.id) +
-                    ": " +
+                    _vm._s(key) +
+                    ". " +
                     _vm._s(item.name) +
                     "\n        "
                 )
               ]),
               _vm._v(" "),
-              _vm._m(1, true),
+              _c("span", { staticClass: "panel-icon column is-1" }, [
+                _c("i", {
+                  staticClass: "has-text-danger fa fa-trash-o",
+                  attrs: { "aria-hidden": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.openRemove(item)
+                    }
+                  }
+                })
+              ]),
               _vm._v(" "),
-              _vm._m(2, true),
+              _c("span", { staticClass: "panel-icon column is-1" }, [
+                _c("i", {
+                  staticClass: "has-text-info fa fa-edit",
+                  attrs: { "aria-hidden": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.openEdit(item)
+                    }
+                  }
+                })
+              ]),
               _vm._v(" "),
-              _vm._m(3, true)
+              _c("span", { staticClass: "panel-icon column is-1" }, [
+                _c("i", {
+                  staticClass: "has-text-primary fa fa-eye",
+                  attrs: { "aria-hidden": "true" },
+                  on: {
+                    click: function($event) {
+                      _vm.openShow(item)
+                    }
+                  }
+                })
+              ])
             ])
           }),
           _vm._v(" "),
-          _vm._m(4)
+          _vm._m(1)
         ],
         2
       ),
       _vm._v(" "),
       _c("Add", {
         attrs: { openModal: _vm.addActive },
+        on: { closeRequest: _vm.close, refresh: _vm.fetchAll }
+      }),
+      _vm._v(" "),
+      _c("Show", {
+        attrs: { openModal: _vm.showActive, user: _vm.user },
         on: { closeRequest: _vm.close }
+      }),
+      _vm._v(" "),
+      _c("Edit", {
+        attrs: { openModal: _vm.editActive, user: _vm.user },
+        on: { closeRequest: _vm.close }
+      }),
+      _vm._v(" "),
+      _c("Remove", {
+        attrs: { openModal: _vm.removeActive, user: _vm.user },
+        on: { closeRequest: _vm.close, refresh: _vm.fetchAll }
       })
     ],
     1
@@ -44066,50 +44164,8 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "panel-block" }, [
-      _c("p", { staticClass: "control has-icons-left" }, [
-        _c("input", {
-          staticClass: "input is-small",
-          attrs: { type: "text", placeholder: "search" }
-        }),
-        _vm._v(" "),
-        _c("span", { staticClass: "icon is-small is-left" }, [
-          _c("i", { staticClass: "fas fa-search" })
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("span", { staticClass: "panel-icon column is-1" }, [
-      _c("i", {
-        staticClass: "has-text-danger fa fa-trash-o",
-        attrs: { "aria-hidden": "true" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("span", { staticClass: "panel-icon column is-1" }, [
-      _c("i", {
-        staticClass: "has-text-info fa fa-edit",
-        attrs: { "aria-hidden": "true" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("span", { staticClass: "panel-icon column is-1" }, [
-      _c("i", {
-        staticClass: "has-text-primary fa fa-eye",
-        attrs: { "aria-hidden": "true" }
-      })
+    return _c("span", { staticClass: "icon is-small is-left" }, [
+      _c("i", { staticClass: "fa fa-search" })
     ])
   },
   function() {
@@ -44221,6 +44277,727 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 52 */,
+/* 53 */,
+/* 54 */,
+/* 55 */,
+/* 56 */,
+/* 57 */,
+/* 58 */,
+/* 59 */,
+/* 60 */,
+/* 61 */,
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(63)
+/* template */
+var __vue_template__ = __webpack_require__(64)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/Show.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-55769598", Component.options)
+  } else {
+    hotAPI.reload("data-v-55769598", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 63 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+
+    props: ['openModal', 'user'],
+
+    data: function data() {
+
+        return {
+
+            errMsg: '',
+            errors: {}
+        };
+    },
+
+
+    methods: {
+        save: function save() {
+            var _this = this;
+
+            console.log('save()...');
+            console.log(this.user);
+
+            axios.post('/phonebook', this.user).then(function (response) {
+                _this.user = { name: '', phone: '', email: '' };
+                _this.$emit('refresh');
+                _this.close();
+            }).catch(function (error) {
+                return _this.errors = error.response.data.errors;
+            });
+        },
+        close: function close() {
+
+            this.$emit('closeRequest');
+        }
+    },
+
+    created: function created() {
+        console.log('Show() created');
+    },
+    mounted: function mounted() {
+        console.log('Show() mounted');
+    }
+});
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "modal ", class: _vm.openModal }, [
+    _c("div", { staticClass: "modal-background" }),
+    _vm._v(" "),
+    _c("div", { staticClass: "modal-card" }, [
+      _c("header", { staticClass: "modal-card-head" }, [
+        _c("p", { staticClass: "modal-card-title" }, [
+          _vm._v("Detail Entry #" + _vm._s(_vm.user.id) + " ")
+        ]),
+        _vm._v(" "),
+        _c("button", {
+          staticClass: "delete",
+          attrs: { "aria-label": "close" },
+          on: { click: _vm.close }
+        })
+      ]),
+      _vm._v(" "),
+      _c("section", { staticClass: "modal-card-body" }, [
+        _c("li", { staticClass: "panel-block" }, [
+          _c("label", { staticClass: "column is-2" }, [_vm._v("ID: ")]),
+          _vm._v(" " + _vm._s(_vm.user.id) + "\n            ")
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "panel-block" }, [
+          _c("label", { staticClass: "column is-2" }, [_vm._v("Name: ")]),
+          _vm._v(" " + _vm._s(_vm.user.name) + "\n            ")
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "panel-block" }, [
+          _c("label", { staticClass: "column is-2" }, [_vm._v("Phone: ")]),
+          _vm._v(" " + _vm._s(_vm.user.phone) + "\n            ")
+        ]),
+        _vm._v(" "),
+        _c("li", { staticClass: "panel-block" }, [
+          _c("label", { staticClass: "column is-2" }, [_vm._v("Email: ")]),
+          _vm._v(" " + _vm._s(_vm.user.email) + "\n            ")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("footer", { staticClass: "modal-card-foot" }, [
+        _c("button", { staticClass: "button", on: { click: _vm.close } }, [
+          _vm._v("Cancel")
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-55769598", module.exports)
+  }
+}
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(66)
+/* template */
+var __vue_template__ = __webpack_require__(67)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/Edit.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-48f3f9c1", Component.options)
+  } else {
+    hotAPI.reload("data-v-48f3f9c1", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 66 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+
+    props: ['openModal', 'user'],
+
+    data: function data() {
+
+        return {
+
+            errMsg: '',
+            errors: {}
+        };
+    },
+
+
+    methods: {
+        update: function update() {
+            var _this = this;
+
+            console.log('update()...');
+            console.log(this.user);
+
+            axios.patch('/phonebook/' + this.user.id, this.user).then(function (response) {
+                //this.user = { name:'', phone:'', email:''};
+                _this.$emit('refresh');
+                _this.close();
+            }).catch(function (error) {
+                return _this.errors = error.response.data.errors;
+            });
+        },
+        close: function close() {
+
+            this.$emit('closeRequest');
+        }
+    }
+
+});
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "modal ", class: _vm.openModal }, [
+    _c("div", { staticClass: "modal-background" }),
+    _vm._v(" "),
+    _c("div", { staticClass: "modal-card" }, [
+      _c("header", { staticClass: "modal-card-head" }, [
+        _c("p", { staticClass: "modal-card-title" }, [
+          _vm._v("Edit Entry #" + _vm._s(_vm.user.id) + " ")
+        ]),
+        _vm._v(" "),
+        _c("button", {
+          staticClass: "delete",
+          attrs: { "aria-label": "close" },
+          on: { click: _vm.close }
+        })
+      ]),
+      _vm._v(" "),
+      _c("section", { staticClass: "modal-card-body" }, [
+        _c("div", { staticClass: "field" }, [
+          _c("label", { staticClass: "label" }, [_vm._v("Name")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "control" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.user.name,
+                  expression: "user.name"
+                }
+              ],
+              staticClass: "input",
+              class: { "is-danger": _vm.errors.name },
+              attrs: { type: "text", placeholder: "Name" },
+              domProps: { value: _vm.user.name },
+              on: {
+                click: function($event) {
+                  _vm.errors.name = ""
+                },
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.user, "name", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _vm.errors.name
+            ? _c("small", { staticClass: "has-text-danger" }, [
+                _vm._v(_vm._s(_vm.errors.name[0]))
+              ])
+            : _vm._e()
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "field" }, [
+          _c("label", { staticClass: "label" }, [_vm._v("Phone No.")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "control" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.user.phone,
+                  expression: "user.phone"
+                }
+              ],
+              staticClass: "input",
+              class: { "is-danger": _vm.errors.phone },
+              attrs: { type: "text", placeholder: "Phone" },
+              domProps: { value: _vm.user.phone },
+              on: {
+                click: function($event) {
+                  _vm.errors.phone = ""
+                },
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.user, "phone", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _vm.errors.phone
+            ? _c("small", { staticClass: "has-text-danger" }, [
+                _vm._v(_vm._s(_vm.errors.phone[0]))
+              ])
+            : _vm._e()
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "field" }, [
+          _c("label", { staticClass: "label" }, [_vm._v("E-mail")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "control" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.user.email,
+                  expression: "user.email"
+                }
+              ],
+              staticClass: "input",
+              class: { "is-danger": _vm.errors.email },
+              attrs: { type: "email", placeholder: "E-mail" },
+              domProps: { value: _vm.user.email },
+              on: {
+                click: function($event) {
+                  _vm.errors.email = ""
+                },
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.user, "email", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _vm.errors.email
+            ? _c("small", { staticClass: "has-text-danger" }, [
+                _vm._v(_vm._s(_vm.errors.email[0]))
+              ])
+            : _vm._e()
+        ])
+      ]),
+      _vm._v(" "),
+      _c("footer", { staticClass: "modal-card-foot" }, [
+        _c(
+          "button",
+          { staticClass: "button is-success", on: { click: _vm.update } },
+          [_vm._v("Update changes")]
+        ),
+        _vm._v(" "),
+        _c("button", { staticClass: "button", on: { click: _vm.close } }, [
+          _vm._v("Cancel")
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-48f3f9c1", module.exports)
+  }
+}
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(69)
+/* template */
+var __vue_template__ = __webpack_require__(70)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/assets/js/components/Remove.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2ea2a90a", Component.options)
+  } else {
+    hotAPI.reload("data-v-2ea2a90a", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 69 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+
+    props: ['openModal', 'user'],
+
+    data: function data() {
+
+        return {
+
+            errMsg: '',
+            errors: {}
+        };
+    },
+
+
+    methods: {
+        remove: function remove() {
+            var _this = this;
+
+            console.log('update()...');
+            console.log(this.user);
+
+            axios.delete('/phonebook/' + this.user.id, this.user).then(function (response) {
+                //this.user = { name:'', phone:'', email:''};
+                _this.$emit('refresh');
+                _this.close();
+            }).catch(function (error) {
+                return _this.errors = error.response.data.errors;
+            });
+        },
+        close: function close() {
+
+            this.$emit('closeRequest');
+        }
+    }
+
+});
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "modal ", class: _vm.openModal }, [
+    _c("div", { staticClass: "modal-background" }),
+    _vm._v(" "),
+    _c("div", { staticClass: "modal-card" }, [
+      _c("header", { staticClass: "modal-card-head" }, [
+        _c("p", { staticClass: "modal-card-title" }, [
+          _vm._v("Remove Entry #" + _vm._s(_vm.user.id) + " ")
+        ]),
+        _vm._v(" "),
+        _c("button", {
+          staticClass: "delete",
+          attrs: { "aria-label": "close" },
+          on: { click: _vm.close }
+        })
+      ]),
+      _vm._v(" "),
+      _vm._m(0),
+      _vm._v(" "),
+      _c("footer", { staticClass: "modal-card-foot" }, [
+        _c(
+          "button",
+          { staticClass: "button is-success", on: { click: _vm.remove } },
+          [_vm._v("Yes")]
+        ),
+        _vm._v(" "),
+        _c("button", { staticClass: "button", on: { click: _vm.close } }, [
+          _vm._v("Cancel")
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { staticClass: "modal-card-body" }, [
+      _c("div", { staticClass: "notification is-info" }, [
+        _vm._v(
+          "\n                  Are you sure you want to delete this entry?\n            "
+        )
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-2ea2a90a", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);
